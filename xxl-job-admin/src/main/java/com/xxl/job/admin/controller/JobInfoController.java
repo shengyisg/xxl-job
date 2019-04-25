@@ -4,7 +4,7 @@ import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.route.ExecutorRouteStrategyEnum;
 import com.xxl.job.admin.core.thread.JobTriggerPoolHelper;
-import com.xxl.job.admin.core.util.I18nUtil;
+import com.xxl.job.admin.core.trigger.TriggerTypeEnum;
 import com.xxl.job.admin.dao.XxlJobGroupDao;
 import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -76,22 +76,28 @@ public class JobInfoController {
 		return xxlJobService.remove(id);
 	}
 	
-	@RequestMapping("/pause")
+	@RequestMapping("/stop")
 	@ResponseBody
 	public ReturnT<String> pause(int id) {
-		return xxlJobService.pause(id);
+		return xxlJobService.stop(id);
 	}
 	
-	@RequestMapping("/resume")
+	@RequestMapping("/start")
 	@ResponseBody
-	public ReturnT<String> resume(int id) {
-		return xxlJobService.resume(id);
+	public ReturnT<String> start(int id) {
+		return xxlJobService.start(id);
 	}
 	
 	@RequestMapping("/trigger")
 	@ResponseBody
-	public ReturnT<String> triggerJob(int id) {
-		JobTriggerPoolHelper.trigger(id, -1, I18nUtil.getString("jobconf_trigger_type_manual"));
+	//@PermessionLimit(limit = false)
+	public ReturnT<String> triggerJob(int id, String executorParam) {
+		// force cover job param
+		if (executorParam == null) {
+			executorParam = "";
+		}
+
+		JobTriggerPoolHelper.trigger(id, TriggerTypeEnum.MANUAL, -1, null, executorParam);
 		return ReturnT.SUCCESS;
 	}
 	
